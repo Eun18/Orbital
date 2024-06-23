@@ -10,8 +10,6 @@ export const ProductsContextProvider = ({ children }) => {
   const fetchProducts = async (orderByField = null, orderDirection = null) => {
     let q = collection(db, 'Products');
 
-
-
     if (orderByField && orderDirection) {
       q = query(q, orderBy(orderByField, orderDirection));
     }
@@ -25,7 +23,7 @@ export const ProductsContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    fetchProducts(); // Default fetch on mount
+    fetchProducts();
   }, []);
 
   return (
@@ -34,7 +32,3 @@ export const ProductsContextProvider = ({ children }) => {
     </ProductsContext.Provider>
   );
 };
-/*
-if (sellerID) {
-      q = query(q, where("sellerId", "==", sellerID));
-    }*/

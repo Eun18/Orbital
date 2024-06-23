@@ -1,21 +1,29 @@
-import React, {useContext, useEffect} from "react";
+import React, {useState, useContext, useEffect} from "react";
 import '../styles/Profile.css';
 import { IoMdMail } from "react-icons/io";
 import { FaPhoneAlt, FaStar, FaSchool } from "react-icons/fa";
 import {ProductsContext} from '../GLOBAL/components/ProductsContext';
 import { Link } from 'react-router-dom';
 
+
 export default function Profile({ user, userDetails }) {
   console.log('Current user: ', user);
   console.log('Current user details: ', userDetails);
-  
-  const {products, fetchProducts} = useContext(ProductsContext);
+
+  const { products,fetchProducts } = useContext(ProductsContext);
+  const [userProducts, setUserProducts] = useState([]);
 
   useEffect(() => {
-    if (user) {
-      fetchProducts(user.uid,'createdAt', 'desc');
+    fetchProducts();
+  }, [fetchProducts]);
+
+  useEffect(() => {
+    if (user && products) {
+      const filteredProducts = products.filter(product => product.sellerId === user.uid);
+      setUserProducts(filteredProducts);
     }
-  }, [fetchProducts,user]);
+  }, [user, products]);
+
 
   if (!userDetails) {
     return <div>Loading...</div>;
@@ -37,18 +45,22 @@ export default function Profile({ user, userDetails }) {
       <div className='listing-column'>
         <h2>My Listings</h2>
         <div className='l-image'>
-          {products.map(product => (
-            <div key={product.ProductID}>
-              <figure>
-                <Link to={`/productdetail/${product.productID}`}>
-                  <img src={product.productImage} alt="Image Not Found" />
-                  <figcaption>
-                    {product.productName} <br /> {product.productPrice} <br /> {product.productCondition} <br /> {product.sellerUserName}
-                  </figcaption>
-                </Link>
-              </figure>
-            </div>
-          ))}
+        {userProducts.length > 0 ? (
+            userProducts.map(userproduct => (
+              <div key={userproduct.productID}>
+                <figure>
+                  <Link to={`/productdetail/${userproduct.productID}`}>
+                    <img src={userproduct.productImage} alt="Image Not Found" />
+                    <figcaption>
+                      {userproduct.productName} <br /> {userproduct.productPrice} <br /> {userproduct.productCondition} <br /> {userproduct.sellerUserName}
+                    </figcaption>
+                  </Link>
+                </figure>
+              </div>
+            ))
+          ) : (
+            <p>No products found.</p>
+          )}
           </div>
         <br/>
       </div>

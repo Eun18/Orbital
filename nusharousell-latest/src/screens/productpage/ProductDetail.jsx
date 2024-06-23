@@ -24,7 +24,7 @@ export default function ProductDetail() {
         console.error("error fetching product:", error);
       }
     };
-
+    
     fetchProduct();
   }, [productID]);
 
