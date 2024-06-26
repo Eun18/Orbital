@@ -27,7 +27,7 @@ export default function Signup({props}) {
         imageUrl: '',
         ratings: 0,
         meetupLocation: '',
-        userProducts: [],
+		userProducts: [],
         createdAt: new Date()
       });
       setUserName('');

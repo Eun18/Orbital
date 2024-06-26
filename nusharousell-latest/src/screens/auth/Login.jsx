@@ -5,23 +5,22 @@ import '../styles/Login.css';
 // import SignInwithGoogle from "./signInWIthGoogle";
 
 export default function Login() {
-
-  const [email, setEmail] = useState('');
+  	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  	const [error, setError] = useState('');
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      await signInWithEmailAndPassword(auth, email, password); 
-      setEmail('');
-      setPassword('');
-      setError('');
-      window.location.href = '/';
-    } catch (err) {
-      setError(err.message);
-    }
-  }
+	const handleLogin = async (e) => {
+	e.preventDefault();
+	try {
+		await signInWithEmailAndPassword(auth, email, password); 
+		setEmail('');
+		setPassword('');
+		setError('');
+		window.location.href = '/';
+	} catch (err) {
+		setError(err.message);
+	}
+	}
 
 	return (
 		<div className='container'>

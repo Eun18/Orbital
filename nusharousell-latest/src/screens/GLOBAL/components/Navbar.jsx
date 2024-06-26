@@ -25,7 +25,7 @@ export default function Navbar() {
       console.error("Error logging out:", error.message);
     }
   }
-    
+  
 
 	return (
 		<div className='header'>
@@ -52,7 +52,7 @@ export default function Navbar() {
               </div>
             </div>
             <a href='/'><FaRegHeart /></a>
-            <Link to="/chats"><MdChatBubbleOutline/></Link>
+            <Link to="/chat"><MdChatBubbleOutline /></Link>
             <Link to="/addproduct">Sell</Link>
           </div>
         ) : (

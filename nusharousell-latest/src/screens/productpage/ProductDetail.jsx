@@ -1,14 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { db } from '../../config/firebase';
-
+import React, {useEffect, useState, useContext} from "react";
+import{useParams, Link, useNavigate} from 'react-router-dom';
+import {db,auth} from '../../config/firebase';
+import "../styles/ProductDetail.css";
+import { FaRegHeart } from "react-icons/fa";
+import { ChatContext } from '../chats/ChatContext';
 import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import '../styles/ProductDetail.css';
 import { useUser } from '../GLOBAL/contexts/UserContext'; // Import useUser from context
 
+
 export default function ProductDetail() {
   const { productID } = useParams();
   const [product, setProduct] = useState(null);
+  const {checkChatroom} = useContext(ChatContext);
+  
+  const navigate = useNavigate();
   const { user } = useUser(); // Use user from context
   const [userIsSeller, setUserIsSeller] = useState(false); // State to track if user is the seller
 
@@ -33,9 +39,24 @@ export default function ProductDetail() {
         console.error('Error fetching product:', error);
       }
     };
-
+    
     fetchProduct();
   }, [productID, user]); // Depend on user to handle updates
+
+  const handleChatClick = async (otherUserId) => {
+    try {
+      const currentUser = auth.currentUser; 
+      if (!currentUser) {
+        throw new Error("User is not logged in.");
+      }
+  
+      const currentUseruid = currentUser.uid;
+      const chatroomId = await checkChatroom(currentUseruid, otherUserId); 
+      navigate(`/chat/${chatroomId}`);
+    } catch (error) {
+      console.error("Error handling chat click:", error);
+    }
+  };
 
   const handleMarkAsReserved = async () => {
     try {
@@ -80,6 +101,7 @@ export default function ProductDetail() {
   if (!product) {
     return <div>Loading...</div>;
   }
+
 
   return (
     <>
@@ -148,3 +170,4 @@ export default function ProductDetail() {
     </>
   );
 }
+//<button onClick={() => handleChatClick(product.sellerId)}>Chat with seller</button>

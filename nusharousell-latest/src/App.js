@@ -9,7 +9,10 @@ import AddProduct from './screens/sell/AddProduct';
 import ProductDetail from './screens/productpage/ProductDetail';
 import Profile from './screens/profile/Profile';
 import EditProfile from './screens/profile/EditProfile';
-import Chat from './screens/chats/Chat';
+import {ProductsContextProvider} from './screens/GLOBAL/components/ProductsContext';
+import {ChatContextProvider} from './screens/chats/ChatContext';
+import ChatLayout from "./screens/chats/ChatLayout";
+import ChatPage from "./screens/chats/ChatPage";
 import { ProductsProvider } from './screens/GLOBAL/contexts/ProductsContext';
 import { UserProvider } from './screens/GLOBAL/contexts/UserContext';
 
@@ -25,58 +28,63 @@ export default function App() {
 	return (
 		<Router>
 			<div className='App'>
-      <UserProvider>
-			<ProductsProvider>
-				<Routes>
-					<Route
-						path='/'
-						element={<Homepage/>}
-					/>
-					<Route
-						path='/login'
-						element={<Login />}
-					/>
-					<Route
-						path='/signup'
-						element={<Signup />}
-					/>
-					<Route
-						path='/addproduct'
-						element={
-							<AddProduct/>
-						}
-					/>
-					<Route
-						path='/productdetail/:productID'
-						element={<ProductDetail
-								product={product}
-								setProduct={setProduct} 
-							/>
-						}
-					/>
-					<Route
-						path='/chat'
-						element={<Chat />}
-					/>
-					<Route
-						path='/profile'
-						element={
-							<Profile/>
-						}
-					/>
-					<Route
-						path='/profile/edit'
-						element={
-							<EditProfile/>
-						}
-					/>
-					<Route
-						path='*'
-						element={<h1>Error 404: Your Mother Not Found</h1>}
-					/>
-				</Routes>
-				</ProductsProvider>
-        </UserProvider>
+				<ProductsContextProvider>
+					<ChatContextProvider>
+						<UserProvider>
+							<ProductsProvider>
+								<Routes>
+									<Route
+										path='/'
+										element={<Homepage/>}
+									/>
+									<Route
+										path='/login'
+										element={<Login />}
+									/>
+									<Route
+										path='/signup'
+										element={<Signup />}
+									/>
+									<Route
+										path='/addproduct'
+										element={
+											<AddProduct/>
+										}
+									/>
+									<Route
+										path='/productdetail/:productID'
+										element={<ProductDetail
+												product={product}
+												setProduct={setProduct} 
+											/>
+										}
+									/>
+									<Route path="/chat" element={<ChatLayout />}>
+										<Route path="" element={<div className="no-chat-selected">Please select a chat to start messaging</div>} />
+										<Route path=":chatroomId" element={<ChatPage />} />
+									</Route>
+
+									<Route
+										path='/profile'
+										element={
+											<Profile/>
+										}
+									/>
+									<Route
+										path='/profile/edit'
+										element={
+											<EditProfile/>
+										}
+									/>
+									<Route
+										path='*'
+										element={<h1>Error 404: Your Mother Not Found</h1>}
+									/>
+								</Routes>
+							</ProductsProvider>
+						</UserProvider>
+					</ChatContextProvider>
+				</ProductsContextProvider>
 			</div>
 		</Router>
 	);
