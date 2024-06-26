@@ -11,10 +11,11 @@ import AddProduct from './screens/sell/AddProduct';
 import ProductDetail from './screens/productpage/ProductDetail';
 import Profile from './screens/profile/Profile';
 import EditProfile from './screens/profile/EditProfile';
-import Chat from './screens/chats/Chat';
 import Test from './screens/test/Test';
 import {ProductsContextProvider} from './screens/GLOBAL/components/ProductsContext';
-
+import {ChatContextProvider} from './screens/chats/ChatContext';
+import ChatLayout from "./screens/chats/ChatLayout";
+import ChatPage from "./screens/chats/ChatPage";
 
 export default function App() {
 	const [product, setProduct] = useState([]);
@@ -70,6 +71,7 @@ export default function App() {
 		<Router>
 			<div className='App'>
 			<ProductsContextProvider>
+			<ChatContextProvider>
 				<Routes>
 					<Route
 						path='/'
@@ -109,10 +111,11 @@ export default function App() {
 							/>
 						}
 					/>
-					<Route
-						path='/chat'
-						element={<Chat user={user} />}
-					/>
+					<Route path="/chat" element={<ChatLayout />}>
+						<Route path="" element={<div className="no-chat-selected">Please select a chat to start messaging</div>} />
+						<Route path=":chatroomId" element={<ChatPage />} />
+					</Route>
+
 					<Route
 						path='/profile'
 						element={
@@ -140,6 +143,7 @@ export default function App() {
             element={<Test />}
           />
 				</Routes>
+				</ChatContextProvider>
 				</ProductsContextProvider>
 			</div>
 		</Router>

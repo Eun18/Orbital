@@ -6,7 +6,7 @@ import { setDoc, doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db, storage } from '../../config/firebase';
 import '../styles/AddProduct.css';
 
-export default function AddProduct({ user, userDetails, product, setProduct }) {
+export default function AddProduct({ user, userDetails }) {
 	const [productName, setProductName] = useState('');
 	const [category, setCategory] = useState('');
 	const [condition, setCondition] = useState('');

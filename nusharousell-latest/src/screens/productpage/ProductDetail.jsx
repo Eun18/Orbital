@@ -1,15 +1,17 @@
-import React, {useEffect, useState} from "react";
-import{useParams} from 'react-router-dom';
-import {db} from '../../config/firebase';
+import React, {useEffect, useState, useContext} from "react";
+import{useParams, Link, useNavigate} from 'react-router-dom';
+import {db,auth} from '../../config/firebase';
 import "../styles/ProductDetail.css";
 import { FaRegHeart } from "react-icons/fa";
 import { doc, getDoc } from 'firebase/firestore';
-import { Link } from 'react-router-dom';
+import { ChatContext } from '../chats/ChatContext';
 
 export default function ProductDetail() {
   const {productID} = useParams();
   const [product, setProduct] = useState(null);
-
+  const {checkChatroom} = useContext(ChatContext);
+  
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchProduct = async() => {
       try {
@@ -28,9 +30,25 @@ export default function ProductDetail() {
     fetchProduct();
   }, [productID]);
 
+  const handleChatClick = async (otherUserId) => {
+    try {
+      const currentUser = auth.currentUser; 
+      if (!currentUser) {
+        throw new Error("User is not logged in.");
+      }
+  
+      const currentUseruid = currentUser.uid;
+      const chatroomId = await checkChatroom(currentUseruid, otherUserId); 
+      navigate(`/chat/${chatroomId}`);
+    } catch (error) {
+      console.error("Error handling chat click:", error);
+    }
+  };
+
   if (!product){
     return <div>Loading...</div>;
   }
+
 
   return (
     <>
@@ -56,7 +74,7 @@ export default function ProductDetail() {
           <h4> Seller </h4>
           <p> {product.sellerUserName} </p>
           <br />
-          <Link to="/chat">Chat with seller</Link>
+          <button onClick={() => handleChatClick(product.sellerId)}>Chat with seller</button>
           <Link to="/"><FaRegHeart /></Link>
         </div>
       </div>

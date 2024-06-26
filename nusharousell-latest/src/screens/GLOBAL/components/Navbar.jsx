@@ -5,7 +5,7 @@ import logo from '../assets/logos/horizontal-logo.png';
 import { FaSearch, FaRegHeart } from 'react-icons/fa';
 import { MdChatBubbleOutline } from 'react-icons/md';
 import { CgProfile } from 'react-icons/cg';
-import { Link } from 'react-router-dom';
+import { Link} from 'react-router-dom';
 
 export default function Navbar({ userDetails, setUserDetails }) {
 
@@ -23,7 +23,7 @@ export default function Navbar({ userDetails, setUserDetails }) {
       console.error("Error logging out:", error.message);
     }
   }
-    
+  
 
 	return (
 		<div className='header'>
@@ -50,7 +50,7 @@ export default function Navbar({ userDetails, setUserDetails }) {
               </div>
             </div>
             <a href='/'><FaRegHeart /></a>
-            <Link to="/chats"><MdChatBubbleOutline/></Link>
+            <Link to="/chat"><MdChatBubbleOutline /></Link>
             <Link to="/addproduct">Sell</Link>
           </div>
         ) : (
