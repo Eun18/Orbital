@@ -3,8 +3,10 @@ import Dropdown from '../sell/FormDropdown';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db, storage } from '../../config/firebase';
+import { useUser } from '../GLOBAL/contexts/UserContext';
 
-export default function EditProfile({ user, userDetails }) {
+export default function EditProfile() {
+  const { user, setUser } = useUser();
 	const [imageUrl, setImageUrl] = useState(user?.image || '');
 	const [newImageFile, setNewImageFile] = useState(null);
 	const [userName, setUserName] = useState(user?.userName || '');
@@ -38,12 +40,12 @@ export default function EditProfile({ user, userDetails }) {
     }
   };
 
-	const userImageUploader = (newImageFile, userId) => {
+	const userImageUploader = (newImageFile, userID) => {
 		if (!newImageFile) {
 			return null;
 		} else {
 			return new Promise((resolve, reject) => {
-				const newImageRef = ref(storage, `user-images/${userId}_${newImageFile.name}`);
+				const newImageRef = ref(storage, `user-images/${userID}_${newImageFile.name}`);
 				const uploadTask = uploadBytesResumable(newImageRef, newImageFile);
 
 				uploadTask.on(
@@ -77,7 +79,7 @@ export default function EditProfile({ user, userDetails }) {
 		e.preventDefault();
 		try {  
 			// Update Firestore document
-			const userDoc = doc(db, 'Users', user.uid);
+			const userDoc = doc(db, 'Users', user.userID);
 			await updateDoc(userDoc, updatedUserDoc);
       const latestUserDoc = await getDoc(userDoc);
 			console.log('Successfully updated user profile to ', latestUserDoc.data());
@@ -106,7 +108,7 @@ export default function EditProfile({ user, userDetails }) {
 					<button
 						type='button'
 						className='btn btn-success'
-						onClick={() => userImageUploader(newImageFile, user.uid)}>
+						onClick={() => userImageUploader(newImageFile, user.userID)}>
 						Upload picture
 					</button>
 				) : (
@@ -124,7 +126,7 @@ export default function EditProfile({ user, userDetails }) {
 				<input
 					value={userName}
 					type='text'
-					placeholder={userDetails.userName}
+					placeholder={user.userName}
 					onChange={(e) => setUserName(e.target.value)}
 				/>
 				<br />

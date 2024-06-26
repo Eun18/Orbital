@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { auth, db } from './config/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 // import UserProvider from './screens/GLOBAL/contexts/UserContext';
 // import ProductsProvider from './screens/GLOBAL/contexts/ProductsContext';
@@ -11,139 +9,81 @@ import AddProduct from './screens/sell/AddProduct';
 import ProductDetail from './screens/productpage/ProductDetail';
 import Profile from './screens/profile/Profile';
 import EditProfile from './screens/profile/EditProfile';
-import Test from './screens/test/Test';
 import {ProductsContextProvider} from './screens/GLOBAL/components/ProductsContext';
 import {ChatContextProvider} from './screens/chats/ChatContext';
 import ChatLayout from "./screens/chats/ChatLayout";
 import ChatPage from "./screens/chats/ChatPage";
+import { ProductsProvider } from './screens/GLOBAL/contexts/ProductsContext';
+import { UserProvider } from './screens/GLOBAL/contexts/UserContext';
+
 
 export default function App() {
 	const [product, setProduct] = useState([]);
-  /* TODO
-  const user = useContext(UserContext);
-  const setUser = useContext(SetUserContext);
-  const userDetails = useContext(UserDetailsContext);
-  const setUserDetails = useContext(SetUserDetailsContext);
-  */
-	const [user, setUser] = useState(null);
-	const [userDetails, setUserDetails] = useState(null);
-	const [error, setError] = useState(null);
 	/* *******SEARCHING PRODUCT********
   const searchproduct = (searchTerm) => {
     console.log("Searching for:", searchTerm);
   };
   */
 
-	const fetchUser = async () => {
-		auth.onAuthStateChanged(async (user) => {
-			if (user) {
-				try {
-					const userDoc = doc(db, 'Users', user.uid);
-					const docSnapshot = await getDoc(userDoc);
-					const userDetails = docSnapshot.data();
-					setUser(user);
-					setUserDetails(userDetails);
-					// to obtain userId: use
-					// const userId = user.uid;
-					// to obtain userDetails: use
-					// const getUserDetails = async () => {
-					// const userDoc = doc(db, "Users", user.uid)
-					// const docSnapshot = await getDoc(userDoc)
-					// const userDetails = docSnapshot.data();
-					console.log('Current user:', user);
-					console.log('Current user details:', userDetails);
-					setError(null);
-				} catch (err) {
-					setError(err.message);
-					// To place somewhere!!
-					// {error && <span className='error-msg'>{error}</span>}
-				}
-			}
-		});
-	};
-
-	// Use useEffect to call fetchData when the component mounts
-	useEffect(() => {
-		fetchUser();
-	}, []); // Empty dependency array ensures this runs only once when the component mounts
-
 	return (
 		<Router>
 			<div className='App'>
-			<ProductsContextProvider>
-			<ChatContextProvider>
-				<Routes>
-					<Route
-						path='/'
-						element={
-							<Homepage
-								userDetails={userDetails}
-								setUserDetails={setUserDetails}
-							/>
-						}
-					/>
-					<Route
-						path='/login'
-						element={<Login />}
-					/>
-					<Route
-						path='/signup'
-						element={<Signup />}
-					/>
-					<Route
-						path='/addproduct'
-						element={
-							<AddProduct
-								user={user}
-								userDetails={userDetails}
-								product={product}
-								setProduct={setProduct}
-							/>
-						}
-					/>
-					<Route
-						path='/productdetail/:productID'
-						element={<ProductDetail
-								user={user}
-								userDetails={userDetails}
-								product={product}
-								setProduct={setProduct} 
-							/>
-						}
-					/>
-					<Route path="/chat" element={<ChatLayout />}>
-						<Route path="" element={<div className="no-chat-selected">Please select a chat to start messaging</div>} />
-						<Route path=":chatroomId" element={<ChatPage />} />
-					</Route>
+				<ProductsContextProvider>
+					<ChatContextProvider>
+						<UserProvider>
+							<ProductsProvider>
+								<Routes>
+									<Route
+										path='/'
+										element={<Homepage/>}
+									/>
+									<Route
+										path='/login'
+										element={<Login />}
+									/>
+									<Route
+										path='/signup'
+										element={<Signup />}
+									/>
+									<Route
+										path='/addproduct'
+										element={
+											<AddProduct/>
+										}
+									/>
+									<Route
+										path='/productdetail/:productID'
+										element={<ProductDetail
+												product={product}
+												setProduct={setProduct} 
+											/>
+										}
+									/>
+									<Route path="/chat" element={<ChatLayout />}>
+										<Route path="" element={<div className="no-chat-selected">Please select a chat to start messaging</div>} />
+										<Route path=":chatroomId" element={<ChatPage />} />
+									</Route>
 
-					<Route
-						path='/profile'
-						element={
-							<Profile
-								user={user}
-								userDetails={userDetails}
-							/>
-						}
-					/>
-					<Route
-						path='/profile/edit'
-						element={
-							<EditProfile
-								user={user}
-								userDetails={userDetails}
-							/>
-						}
-					/>
-					<Route
-						path='*'
-						element={<h1>Error 404: Your Mother Not Found</h1>}
-					/>
-          <Route 
-            path='/test'
-            element={<Test />}
-          />
-				</Routes>
-				</ChatContextProvider>
+									<Route
+										path='/profile'
+										element={
+											<Profile/>
+										}
+									/>
+									<Route
+										path='/profile/edit'
+										element={
+											<EditProfile/>
+										}
+									/>
+									<Route
+										path='*'
+										element={<h1>Error 404: Your Mother Not Found</h1>}
+									/>
+								</Routes>
+							</ProductsProvider>
+						</UserProvider>
+					</ChatContextProvider>
 				</ProductsContextProvider>
 			</div>
 		</Router>

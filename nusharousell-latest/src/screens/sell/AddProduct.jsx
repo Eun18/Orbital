@@ -4,9 +4,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { setDoc, doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db, storage } from '../../config/firebase';
+import { useUser } from '../GLOBAL/contexts/UserContext';
 import '../styles/AddProduct.css';
 
-export default function AddProduct({ user, userDetails }) {
+export default function AddProduct() {
+  const { user } = useUser();
 	const [productName, setProductName] = useState('');
 	const [category, setCategory] = useState('');
 	const [condition, setCondition] = useState('');
@@ -28,76 +30,77 @@ export default function AddProduct({ user, userDetails }) {
 		}
 	};
 
-  const productImageUploader = (newImageFile, productId) => {
-    return new Promise((resolve, reject) => {
-      const newImageRef = ref(storage, `product-images/${productId}_${newImageFile.name}`);
-      const uploadTask = uploadBytesResumable(newImageRef, newImageFile);
+	const productImageUploader = (newImageFile, productID) => {
+		return new Promise((resolve, reject) => {
+			const newImageRef = ref(storage, `product-images/${productID}_${newImageFile.name}`);
+			const uploadTask = uploadBytesResumable(newImageRef, newImageFile);
 
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-				  console.log(progress);
-        },
-        (err) => {
-          setError(err.message);
-          reject(err.message);
-        },
-        async () => {
-          try {
-            const imageUrl = await getDownloadURL(uploadTask.snapshot.ref);
-            console.log("Image URL:", imageUrl)
-            resolve(imageUrl);
-          } catch (err) {
-            setError(err.message);
-            reject(err.message);
-          }
-        }
-      );
-    });
-  };
+			uploadTask.on(
+				'state_changed',
+				(snapshot) => {
+					const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+					console.log(progress);
+				},
+				(err) => {
+					setError(err.message);
+					reject(err.message);
+				},
+				async () => {
+					try {
+						const imageUrl = await getDownloadURL(uploadTask.snapshot.ref);
+						console.log('Image URL:', imageUrl);
+						resolve(imageUrl);
+					} catch (err) {
+						setError(err.message);
+						reject(err.message);
+					}
+				}
+			);
+		});
+	};
 
-  const handleAddProduct = async (e) => {
+	const handleAddProduct = async (e) => {
 		e.preventDefault();
 
-    try {
-      const productId = uuidv4();
-      const imageUrl = await productImageUploader(image, productId);
-      await setDoc(doc(db, 'Products', productId), {
-        sellerUserName: userDetails.userName,
-        sellerId: user.uid,
-        sellerEmail: userDetails.email,
+		try {
+			const productID = uuidv4();
+			const imageUrl = await productImageUploader(image, productID);
+			await setDoc(doc(db, 'Products', productID), {
+				sellerUserName: user.userName,
+				sellerID: user.userID,
+				sellerEmail: user.email,
 
-        productID: productId,
-        productName: productName,
-        productPrice: Number(price),
-        productCategory: category,
-        productCondition: condition,
-        productDescription: description,
-        productLocation: location,
-        productImage: imageUrl,
-        createdAt: new Date(),
-      });
-	  
-	  const userDocRef = doc(db, 'Users', user.uid);
-		await updateDoc(userDocRef, {
-		userProducts: arrayUnion(productId), 
-		});
+				productID: productID,
+				productName: productName,
+				productPrice: Number(price),
+				productCategory: category,
+				productCondition: condition,
+				productDescription: description,
+				productLocation: location,
+				productImage: imageUrl,
+				createdAt: new Date(),
+        productStatus: 'Available',
+			});
 
-      setProductName('');
-      setPrice(0);
-      setCategory('');
-      setCondition('');
-      setDescription('');
-      setLocation('');
-      setImage(null);
-      setError('');
-      document.getElementById('file').value = '';
-      window.location.href = '/';
-    } catch (err) {
-      setError(err.message);
-    }
-  }
+			const userDocRef = doc(db, 'Users', user.userID);
+			await updateDoc(userDocRef, {
+				userProducts: arrayUnion(productID),
+			});
+
+			setProductName('');
+			setPrice(0);
+			setCategory('');
+			setCondition('');
+			setDescription('');
+			setLocation('');
+			setImage(null);
+			setError('');
+			document.getElementById('file').value = '';
+			window.location.href = '/';
+		} catch (err) {
+			setError(err.message);
+		}
+	};
 
 	return (
 		<>
@@ -164,7 +167,7 @@ export default function AddProduct({ user, userDetails }) {
 					Submit
 				</button>
 			</form>
-      {error && <span className='error-msg'>{error}</span>}
+			{error && <span className='error-msg'>{error}</span>}
 		</>
 	);
 }
