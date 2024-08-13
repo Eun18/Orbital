@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom'
+import { useAuthUser } from '../contexts/AuthUserContext';
 import logo from '../assets/logos/logo.png';
 import "../../styles/Footer.css";
 
 export default function Footer(){
+    const { user, setUser } = useAuthUser();
     return(
         <div className = 'body'>
         <div className='footer'>
@@ -22,13 +24,20 @@ export default function Footer(){
                 <Link to="https://github.com/Eun18">Eunice</Link>
                 <Link to="https://github.com/chrisganaeshfx">Chris</Link>
             </div>
-            <div className='Links'>
-                <h3>Links</h3>
-                <a href="/">Home</a>
-                <Link to='/userprofile'>Profile</Link>
-                <Link to='/chats'>Chats</Link>
-                <Link to='/like'>Likes</Link>
-            </div>            
+                {user ? (
+                    <div className='Links'>
+                        <h3>Links</h3>
+                        <a href="/">Home</a>
+                        <Link to={`/userprofile/view/${user.userID}`}>Profile</Link>
+                        <Link to='/chats'>Chats</Link>
+                        <Link to='/like'>Likes</Link>
+                    </div>
+                ) : (
+                    <div className='Links'>
+                        <h3>Links</h3>
+                        <a href="/">Home</a>
+                    </div>
+                )}         
         </div>
         </div>
     );
